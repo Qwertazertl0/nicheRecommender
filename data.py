@@ -114,7 +114,6 @@ def get_data(location: str) -> None:
             data_writer.writerow(out)
 
 
-
 if __name__ == "__main__":
     location = input("Input location: ")
     get_data(location)
