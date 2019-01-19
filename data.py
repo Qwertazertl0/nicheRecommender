@@ -2,6 +2,20 @@ import sample as yelp
 import pandas as pd
 from key import API_KEY
 
+
+def clean_yelp_string(name: str) -> str:
+    # Clean up the name string
+    name_split = list(map(str.title, name.split("-")))
+    # for i in range(len(name_split)):
+    last_index = len(name_split) - 1
+    if name_split[last_index].isdigit():
+        name_split[last_index] = ''  # Strip out the 2 or 3 that yelp adds
+
+    name_proper = " ".join(name_split)
+
+    return name_proper
+
+
 limit = 50 # max 50 per request
 num_requests = 20
 # num_requests = 20 # (to get 20*50 = 1000)
@@ -12,7 +26,7 @@ dataframes = []
 for i in range(num_requests):
 
     df = pd.DataFrame(yelp.search(API_KEY, "restaurants", location, lim=limit, offset=i*limit)['businesses'],
-                      columns=['id', 'alias', 'rating', 'review_count', 'categories'],
+                      columns=['id', 'alias', 'rating', 'review_count', 'categories', 'coordinates'],
                       )
 
     dataframes.append(df)
@@ -52,7 +66,8 @@ data = []
 
 for index, row in combined_df.iterrows():
     if quantile1 < row['review_count'] < quantile2:
-        data.append([row['alias'], row['rating'], row['review_count']])
+        data.append([row['alias'], row['rating'], row['review_count'],
+                     row['coordinates']])
 
     # Possible to do? More precise location (Toronto is big!)? But
     # somewhere like Markham isn't that big
@@ -67,15 +82,10 @@ out = []
 
 for lst in data[:num_results]:
     name = lst[0] # Pick up only the name
-    # Clean up the name string
-    name_split = list(map(str.title, name.split("-")))
-    # for i in range(len(name_split)):
-    last_index = len(name_split) - 1
-    if name_split[last_index].isdigit():
-        name_split[last_index] = '' # Strip out the 2 or 3 that yelp adds
 
-    name_proper = " ".join(name_split)
+    name_proper = clean_yelp_string(name)
 
     out.append(name_proper)
+    out.extend(lst[1:])
 
 print(out)
