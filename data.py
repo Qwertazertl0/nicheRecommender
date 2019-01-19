@@ -1,6 +1,7 @@
 import sample as yelp
 import pandas as pd
 from key import API_KEY
+import csv
 
 
 def clean_yelp_string(name: str) -> str:
@@ -19,7 +20,7 @@ def clean_yelp_string(name: str) -> str:
 limit = 50 # max 50 per request
 num_requests = 20
 # num_requests = 20 # (to get 20*50 = 1000)
-location = 'markham'
+location = 'toronto'
 
 dataframes = []
 
@@ -66,8 +67,14 @@ data = []
 
 for index, row in combined_df.iterrows():
     if quantile1 < row['review_count'] < quantile2:
+
+        coord_d = row['coordinates']
+        # latitude is first key and longitude is second key in this dict
+        latitude = coord_d['latitude']
+        longitude = coord_d['longitude']
+
         data.append([row['alias'], row['rating'], row['review_count'],
-                     row['coordinates']])
+                    latitude, longitude])
 
     # Possible to do? More precise location (Toronto is big!)? But
     # somewhere like Markham isn't that big
@@ -78,14 +85,25 @@ data.sort(key= lambda x: -float(x[1])) # reverse order, highest rating first
 
 num_results = 10
 
-out = []
 
-for lst in data[:num_results]:
-    name = lst[0] # Pick up only the name
+# print(out)
 
-    name_proper = clean_yelp_string(name)
+with open('results.csv', 'w') as csvfile:
+    data_writer = csv.writer(csvfile, delimiter=',')
 
-    out.append(name_proper)
-    out.extend(lst[1:])
+    for lst in data[:num_results]:
 
-print(out)
+        out = []
+
+        name = lst[0]  # Pick up only the name
+
+        name_proper = clean_yelp_string(name)
+
+        out.append(name_proper)
+        out.extend(lst[1:])
+
+        print(out)
+
+        data_writer.writerow(out)
+
+
