@@ -40,6 +40,11 @@ quantile1 = combined_df['review_count'].quantile(start_quantile)
 while quantile1 < min_review_threshold:
     start_quantile += quantile_increment
     quantile1 = combined_df['review_count'].quantile(start_quantile)
+    if start_quantile > 0.9: # ie there are just not enough reviews
+        start_quantile = 0
+        quantile_interval = 1
+        # Get everything, if there just aren't enough results
+        break
 
 quantile2 = combined_df['review_count'].quantile(start_quantile + quantile_interval)
 
