@@ -16,17 +16,22 @@ ui <- fluidPage(
   actionButton("recalc", "New points")
 )
 
+
 ## SERVER ----------------------------------
 
 server <- function(input, output, session) {
-  points <- eventReactive(input$recalc, {cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)}, ignoreNULL = FALSE)
+  dat <- read_csv('C:\\Users\\Mariam\\Documents\\yelp_dataset\\yelp_dataset~\\reviews_v1.csv')
+  colnames(dat) = c("name", "rating", "review_count", "latitude", "longitude", "coordinates")
   output$mymap <- renderLeaflet({
-    leaflet() %>%
+    leaflet(data = dat) %>%
       addProviderTiles(providers$Stamen.TonerLite, options = providerTileOptions(noWrap = TRUE)) %>%
-      addMarkers(data = points())
+      addCircleMarkers(~longitude, ~latitude, clusterOptions = markerClusterOptions()
+                       , group="CLUSTER", popup= ~paste('<b><font color="Black">','Restaurant Data','</font></b><br/>', 
+                                                        'Name:', name, '<br/>', 'Rating:', rating, '<br/>', 'Review Count:', review_count, '<br/>'))
   })
 }
-  
+
+
 ## DEPLOY APP ----------------------------------
-  
+
 shinyApp(ui, server, options=list(height=1080))
