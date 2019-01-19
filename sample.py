@@ -42,7 +42,6 @@ BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 # Defaults for our simple example.
 DEFAULT_TERM = 'dinner'
 DEFAULT_LOCATION = 'San Francisco, CA'
-SEARCH_LIMIT = 3
 
 
 def request(host, path, api_key, url_params=None):
@@ -73,12 +72,13 @@ def request(host, path, api_key, url_params=None):
     return response.json()
 
 
-def search(api_key, term, location):
+def search(api_key, term, location, lim=10):
     """Query the Search API by a search term and location.
 
     Args:
         term (str): The search term passed to the API.
         location (str): The search location passed to the API.
+        lim (int): The number results to return
 
     Returns:
         dict: The JSON response from the request.
@@ -87,7 +87,7 @@ def search(api_key, term, location):
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
-        'limit': SEARCH_LIMIT
+        'limit': lim
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
@@ -102,6 +102,20 @@ def get_business(api_key, business_id):
         dict: The JSON response from the request.
     """
     business_path = BUSINESS_PATH + business_id
+
+    return request(API_HOST, business_path, api_key)
+
+
+def get_review(api_key, business_id):
+    """Query the Business API by a business ID.
+
+    Args:
+        business_id (str): The ID of the business to query.
+
+    Returns:
+        dict: The JSON response from the request of reviews.
+    """
+    business_path = BUSINESS_PATH + business_id + "/reviews"
 
     return request(API_HOST, business_path, api_key)
 
