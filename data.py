@@ -43,19 +43,34 @@ while quantile1 < min_review_threshold:
 
 quantile2 = combined_df['review_count'].quantile(start_quantile + quantile_interval)
 
-out = []
+data = []
 
 for index, row in combined_df.iterrows():
     if quantile1 < row['review_count'] < quantile2:
-        out.append([row['alias'], row['rating'], row['review_count']])
+        data.append([row['alias'], row['rating'], row['review_count']])
 
     # Possible to do? More precise location (Toronto is big!)? But
     # somewhere like Markham isn't that big
 
     # print(row['alias'], row['rating'])
 
-out.sort(key= lambda x: -float(x[1])) # reverse order, highest rating first
+data.sort(key= lambda x: -float(x[1])) # reverse order, highest rating first
 
 num_results = 10
 
-print(out[:num_results])
+out = []
+
+for lst in data[:num_results]:
+    name = lst[0] # Pick up only the name
+    # Clean up the name string
+    name_split = list(map(str.title, name.split("-")))
+    # for i in range(len(name_split)):
+    last_index = len(name_split) - 1
+    if name_split[last_index].isdigit():
+        name_split[last_index] = '' # Strip out the 2 or 3 that yelp adds
+
+    name_proper = " ".join(name_split)
+
+    out.append(name_proper)
+
+print(out)
