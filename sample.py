@@ -72,7 +72,7 @@ def request(host, path, api_key, url_params=None):
     return response.json()
 
 
-def search(api_key, term, location, lim=10, offset=0):
+def search(api_key, term, location, lim=10, offset=0, sort_by = "rating"):
     """Query the Search API by a search term and location.
 
     Args:
@@ -88,7 +88,8 @@ def search(api_key, term, location, lim=10, offset=0):
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
         'limit': lim,
-        'offset': offset
+        'offset': offset,
+        'sort_by': sort_by
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
