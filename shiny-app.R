@@ -3,19 +3,23 @@ library(leaflet)
 library(shinythemes)
 library(leaflet.extras)
 library(tidyverse)
+library(reticulate)
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
+
+use_python("C:\\Users\\Mariam\\AppData\\Local\\Programs\\Python\\Python37\\python3.exe")
+source_python('C:\\Users\\Mariam\\PycharmProjects\\uofthacks\\data.py')
+
 
 ## UI ----------------------------------
 
 ui <- fluidPage(
   navbarPage("nicheRecommender", tabPanel("Map"), tabPanel("Data"), tabPanel("Plots")),
   theme = shinytheme("united"),
-  leafletOutput("mymap"),
-  p(),
-  actionButton("recalc", "New points")
-)
+  leafletOutput("mymap", height = "95vh"),
+  p(), textInput("text", label = h3("Enter your city:"), value = "Enter text..."), hr(), fluidRow(column(3, verbatimTextOutput("value"))), get_data("text"))
+
 
 
 ## SERVER ----------------------------------
